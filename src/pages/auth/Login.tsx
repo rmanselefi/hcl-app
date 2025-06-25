@@ -13,6 +13,9 @@ import { Label } from "@/components/ui/label";
 import { loginSchema, type LoginForm } from "@/schema/login";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { login } from "@/lib/services/auth.service";
+import { useNavigate } from "react-router-dom";
 
 export function Login() {
   const {
@@ -23,24 +26,34 @@ export function Login() {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (data: LoginForm) => {
-    console.log("Form submitted:", data);
+  const navigate = useNavigate();
+
+  const onSubmit = async (data: LoginForm) => {
+    console.log("i got here");
+    try {
+      const res = await login({ email: data.email, password: data.password });
+      localStorage.setItem("token", res.data.token);
+      navigate("/books");
+    } catch (error) {
+      console.error(error);
+      toast.error("Login failed. Please try again");
+    }
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-accent-foreground">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
-          <CardAction>
-            <Button variant="link">Create account</Button>
-          </CardAction>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div className="flex items-center justify-center h-screen bg-accent-foreground">
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <CardTitle>Login to your account</CardTitle>
+            <CardDescription>
+              Enter your email below to login to your account
+            </CardDescription>
+            <CardAction>
+              <Button variant="link">Create account</Button>
+            </CardAction>
+          </CardHeader>
+          <CardContent>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
@@ -56,15 +69,8 @@ export function Login() {
                 )}
               </div>
               <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
+                <Label htmlFor="password">Password</Label>
+
                 <Input
                   id="password"
                   type="password"
@@ -77,14 +83,14 @@ export function Login() {
                 )}
               </div>
             </div>
-          </form>
-        </CardContent>
-        <CardFooter className="flex-col gap-2">
-          <Button type="submit" className="w-full">
-            Login
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
+          </CardContent>
+          <CardFooter className="flex-col gap-2">
+            <Button type="submit" className="w-full">
+              Login
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    </form>
   );
 }

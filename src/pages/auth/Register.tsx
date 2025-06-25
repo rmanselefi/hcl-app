@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function Login() {
+export function Register() {
   return (
     <div className="flex items-center justify-center h-screen bg-accent-foreground">
       <Card className="w-full max-w-sm">
